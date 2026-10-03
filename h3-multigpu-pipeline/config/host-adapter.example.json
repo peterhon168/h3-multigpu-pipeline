@@ -1,0 +1,54 @@
+{
+  "hosts": {
+    "t10": {
+      "ssh_target": "example-user@t10.example.invalid",
+      "ssh_options": ["-i", "/path/to/local/t10-key"],
+      "comfy_root": "/path/to/T10/ComfyUI",
+      "python": "/path/to/T10/ComfyUI/venv/bin/python",
+      "input_dir": "/path/to/T10/ComfyUI/input",
+      "run_root": "/path/to/T10/h3-pipeline-runs",
+      "api_host": "127.0.0.1",
+      "env": {},
+      "unset_env": [],
+      "launch_prefix": [],
+      "extra_args": [],
+      "handoff_ssh_options": ["-i", "/path/to/T10/decoder-handoff-key"]
+    },
+    "xtx": {
+      "ssh_target": "example-user@xtx.example.invalid",
+      "ssh_options": ["-i", "/path/to/local/xtx-key"],
+      "comfy_root": "/path/to/XTX/ComfyUI",
+      "python": "/path/to/XTX/ComfyUI/venv/bin/python",
+      "input_dir": "/path/to/XTX/ComfyUI/input",
+      "run_root": "/path/to/XTX/h3-pipeline-runs",
+      "api_host": "127.0.0.1",
+      "env": {"PYTHONPATH": "/path/to/k2_hip", "ROCM_HOME": "/opt/rocm", "HIP_PATH": "/opt/rocm", "LD_LIBRARY_PATH": "/opt/rocm/lib"},
+      "unset_env": ["CUDA_VISIBLE_DEVICES", "ROCR_VISIBLE_DEVICES"],
+      "launch_prefix": ["numactl", "--cpunodebind=1", "--membind=1"],
+      "extra_args": ["--use-ck-attention", "--disable-xformers"],
+      "same_host_as_decoder": false
+    },
+    "decoder": {
+      "ssh_target": "example-user@decoder.example.invalid",
+      "ssh_options": ["-i", "/path/to/local/decoder-key"],
+      "comfy_root": "/path/to/decoder/ComfyUI",
+      "python": "/path/to/decoder/ComfyUI/venv/bin/python",
+      "input_dir": "/path/to/decoder/ComfyUI/input",
+      "run_root": "/path/to/decoder/h3-pipeline-runs",
+      "api_host": "127.0.0.1",
+      "env": {},
+      "unset_env": ["HIP_VISIBLE_DEVICES", "ROCR_VISIBLE_DEVICES"],
+      "launch_prefix": [],
+      "extra_args": []
+    }
+  },
+  "decoder": {
+    "video_vae": "example/H3-video-vae.safetensors",
+    "audio_vae": "example/H3-audio-vae.safetensors",
+    "transfer": {
+      "preferred": "10gbe",
+      "fallback": "lan",
+      "targets": {"10gbe": "example-decoder-10gbe", "lan": "example-decoder-lan"}
+    }
+  }
+}

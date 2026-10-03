@@ -1,0 +1,249 @@
+{
+  "131": {
+    "class_type": "ComfyMathExpression",
+    "inputs": {
+      "values.a": [
+        "132",
+        0
+      ],
+      "expression": "max(5, round(a * 24)) + (5 - (max(5, round(a * 24)) % 17)) % 17"
+    },
+    "_meta": {
+      "title": "ComfyMathExpression"
+    }
+  },
+  "136": {
+    "class_type": "MiniMaxH3ReferenceToVideo",
+    "inputs": {
+      "clip": [
+        "128",
+        0
+      ],
+      "vae": [
+        "119",
+        0
+      ],
+      "audio_vae": [
+        "120",
+        0
+      ],
+      "ref_images.ref_image_0": [
+        "139",
+        0
+      ],
+      "prompt": [
+        "138",
+        0
+      ],
+      "width": [
+        "115",
+        0
+      ],
+      "height": [
+        "115",
+        1
+      ],
+      "length": [
+        "131",
+        1
+      ],
+      "ref_image_size": "match"
+    },
+    "_meta": {
+      "title": "MiniMaxH3ReferenceToVideo"
+    }
+  },
+  "151": {
+    "class_type": "XFuserSamplerCustomAdvanced",
+    "inputs": {
+      "guider": [
+        "148",
+        0
+      ],
+      "sampler": [
+        "150",
+        0
+      ],
+      "sigmas": [
+        "149",
+        0
+      ],
+      "latent_image": [
+        "136",
+        1
+      ],
+      "add_noise": true,
+      "noise_seed": 0
+    },
+    "_meta": {
+      "title": "XFuserSamplerCustomAdvanced"
+    }
+  },
+  "150": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    },
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "119": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "h3/minimax_h3_video_vae_fp16.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "148": {
+    "class_type": "RayBasicGuider",
+    "inputs": {
+      "ray_actors": [
+        "147",
+        0
+      ],
+      "conditioning": [
+        "136",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "RayBasicGuider"
+    }
+  },
+  "120": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "h3/minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "128": {
+    "class_type": "H3MultiGPUCLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "gpu_ids": "0,1,2,3,4,5,6,7",
+      "offload_after_encode": true
+    },
+    "_meta": {
+      "title": "MiniMax H3 Multi-GPU CLIP Loader"
+    }
+  },
+  "138": {
+    "class_type": "PrimitiveStringMultiline",
+    "inputs": {
+      "value": "Generic portrait video prompt. Replace this text by explicitly supplying --prompt-file to pipeline.py run."
+    },
+    "_meta": {
+      "title": "Input Text (Prompt)"
+    }
+  },
+  "115": {
+    "class_type": "ResolutionSelector",
+    "inputs": {
+      "aspect_ratio": "9:16 (Portrait Widescreen)",
+      "megapixels": 0.3,
+      "multiple": 32
+    },
+    "_meta": {
+      "title": "Resolution Selector (Size)"
+    }
+  },
+  "149": {
+    "class_type": "RayBasicScheduler",
+    "inputs": {
+      "ray_actors": [
+        "147",
+        0
+      ],
+      "scheduler": "simple",
+      "steps": 6,
+      "denoise": 1
+    },
+    "_meta": {
+      "title": "RayBasicScheduler"
+    }
+  },
+  "132": {
+    "class_type": "PrimitiveFloat",
+    "inputs": {
+      "value": 5
+    },
+    "_meta": {
+      "title": "Float (Duration)"
+    }
+  },
+  "146": {
+    "class_type": "RayInitializer",
+    "inputs": {
+      "ray_cluster_address": "local",
+      "ray_cluster_namespace": "default",
+      "GPU": 8,
+      "ulysses_degree": 8,
+      "ring_degree": 1,
+      "cfg_degree": 1,
+      "dp_degree": 1,
+      "sync_ulysses": false,
+      "clear_vram_after_sampling": false,
+      "FSDP": true,
+      "FSDP_CPU_OFFLOAD": false,
+      "XFuser_attention": "TORCH_EFFICIENT",
+      "skip_comm_test": false,
+      "use_mmap": true
+    },
+    "_meta": {
+      "title": "RayInitializer"
+    }
+  },
+  "147": {
+    "class_type": "RayUNETLoader",
+    "inputs": {
+      "ray_actors_init": [
+        "146",
+        0
+      ],
+      "lora": [
+        "158",
+        0
+      ],
+      "unet_name": "H3/10Eros_Max_h3_TURBO-hybrid_beta4_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "RayUNETLoader"
+    }
+  },
+  "158": {
+    "class_type": "RayLoraLoader",
+    "inputs": {
+      "lora_name": "minimax_h3_fl2v_turbo_4step_v0.1_768p_sla_comfyui_bf16.safetensors",
+      "strength_model": 1
+    },
+    "_meta": {
+      "title": "RayLoraLoader"
+    }
+  },
+  "139": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "REFERENCE_IMAGE_REQUIRED"
+    },
+    "_meta": {
+      "title": "LoadImage"
+    }
+  },
+  "save": {
+    "class_type": "SaveH3Latent",
+    "inputs": {
+      "samples": [
+        "151",
+        0
+      ],
+      "filename_prefix": "h3_handoff/RUN_ID/seed_SEED"
+    }
+  }
+}

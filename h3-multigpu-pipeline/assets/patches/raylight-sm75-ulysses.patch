@@ -1,0 +1,36 @@
+diff --git a/src/raylight/diffusion_models/minimax/xdit_context_parallel.py b/src/raylight/diffusion_models/minimax/xdit_context_parallel.py
+index 4243e81..8c8edfa 100644
+--- a/src/raylight/diffusion_models/minimax/xdit_context_parallel.py
++++ b/src/raylight/diffusion_models/minimax/xdit_context_parallel.py
+@@ -30,17 +30,22 @@ def _split_packed_sequence(h, rope_freqs, mod_segments):
+ def usp_attn_forward(self, x, rope_freqs=None, transformer_options={}):
+     sequence_length = x.shape[0]
+     q, k, v = self.qkv_proj(x).split(self.heads * self.head_dim, dim=-1)
++    output_dtype = q.dtype
+     q = self.q_norm(q.view(sequence_length, self.heads, self.head_dim))
+     k = self.k_norm(k.view(sequence_length, self.heads, self.head_dim))
+     v = v.view(sequence_length, self.heads, self.head_dim)
+     if rope_freqs is not None:
+         rot = rope_freqs.shape[-3] * 2
+         q[..., :rot], k[..., :rot] = comfy.quant_ops.ck.apply_rope_split_half(q[..., :rot], k[..., :rot], rope_freqs)
++    # Turing lacks the BF16 memory-efficient attention kernel; communicate in FP16.
++    sm75 = q.is_cuda and torch.cuda.get_device_capability(q.device)[0] < 8
++    if sm75 and q.dtype in (torch.float32, torch.bfloat16):
++        q, k, v = q.to(torch.float16), k.to(torch.float16), v.to(torch.float16)
+     q = q.transpose(0, 1).unsqueeze(0)
+     k = k.transpose(0, 1).unsqueeze(0)
+     v = v.transpose(0, 1).unsqueeze(0)
+     out = xfuser_optimized_attention(q, k, v, self.heads, skip_reshape=True)
+-    return self.out_proj(out.squeeze(0))
++    return self.out_proj(out.squeeze(0).to(output_dtype))
+ 
+ 
+ def usp_dit_forward(self, x, timestep, context, transformer_options={}, minimax_payload=None, **kwargs):
+@@ -145,7 +150,7 @@ def usp_dit_forward(self, x, timestep, context, transformer_options={}, minimax_
+         table = comfy.model_management.cast_to(self.adaln_t_table, device=device)
+         pos = t_vals.clamp(0.0, 1.0) * (table.shape[0] - 1)     # t in [0,1] -> fractional grid index, out-of-range t clamps to the curve ends
+         i0 = pos.floor().long().clamp(max=table.shape[0] - 2)   # lower grid row, max-clamp keeps t=1.0 on the last interval instead of reading past the table
+-        t_emb = torch.lerp(table[i0], table[i0 + 1], (pos - i0).unsqueeze(1))  # blend the two rows by the fractional part
++        t_emb = torch.lerp(table[i0].to(torch.float32), table[i0 + 1].to(torch.float32), (pos - i0).unsqueeze(1)).to(table.dtype)  # [fix] bf16 table vs fp32 weight dtype mismatch  # blend the two rows by the fractional part
+     else:
+         t_emb = self.time_embedder(t_vals).to(dtype)

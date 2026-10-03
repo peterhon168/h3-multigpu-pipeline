@@ -1,0 +1,423 @@
+{
+  "schema_version": "1.0.0",
+  "title": "MiniMax H3 multi-GPU sampling with a single RTX 3080 Ti decoder",
+  "test_date": "2026-10-03",
+  "status": "reviewed_public_release",
+  "unified_cli_acceptance": {"offline_behavior_tests": true, "gpu_end_to_end_rerun": false, "high_resolution_human_quality_review": "pending"},
+  "metric_definitions": {
+    "sampler_seconds": "Prompt submission to ComfyUI history success; not the full pipeline wall time.",
+    "first_output_seconds": "Time from first sampler submission to the first completed pipeline marker unless explicitly identified as a coordinator monotonic measurement.",
+    "makespan_seconds": "Six-job measured coordinator monotonic interval; service startup excluded.",
+    "throughput_per_hour": "6 * 3600 / makespan_seconds; batch-rate conversion, not single-job speed."
+  },
+  "single_job_and_capacity": [
+    {
+      "id": "cold_4t10_416x736_5s",
+      "sampler_route": "4x Tesla T10",
+      "decoder_route": "single RTX 3080 Ti",
+      "resolution": "416x736",
+      "duration_seconds": 5,
+      "output_frames": 124,
+      "sampler_seconds": 229.814,
+      "decoder_tail_seconds": 12.181,
+      "sampler_state": "cold model request",
+      "status": "success",
+      "evidence": ["E1"]
+    },
+    {
+      "id": "cold_8t10_416x736_5s",
+      "sampler_route": "8x Tesla T10",
+      "decoder_route": "single RTX 3080 Ti",
+      "resolution": "416x736",
+      "duration_seconds": 5,
+      "output_frames": 124,
+      "sampler_seconds": 110.395,
+      "decoder_tail_seconds": 11.859,
+      "sampler_state": "cold model request",
+      "status": "success",
+      "comparison_to": "cold_4t10_416x736_5s",
+      "sampler_speedup_ratio": 2.081,
+      "sampler_time_reduction_percent": 52.0,
+      "evidence": ["E1"]
+    },
+    {
+      "id": "warm_8t10_736x1280_5s",
+      "sampler_route": "8x Tesla T10",
+      "decoder_route": "single RTX 3080 Ti",
+      "resolution": "736x1280",
+      "duration_seconds": 5,
+      "output_frames": 124,
+      "sampler_seconds": 167.286,
+      "decoder_tail_seconds": 31.654,
+      "sampler_state": "warm",
+      "status": "success",
+      "evidence": ["E1"]
+    },
+    {
+      "id": "warm_8t10_736x1280_10s",
+      "sampler_route": "8x Tesla T10",
+      "decoder_route": "single RTX 3080 Ti",
+      "resolution": "736x1280",
+      "duration_seconds": 10,
+      "output_frames": 243,
+      "sampler_seconds": 442.11,
+      "decoder_tail_seconds": 59.319,
+      "sampler_state": "warm",
+      "status": "success",
+      "evidence": ["E1"]
+    },
+    {
+      "id": "warm_8t10_544x960_15s",
+      "sampler_route": "8x Tesla T10",
+      "decoder_route": "single RTX 3080 Ti",
+      "resolution": "544x960",
+      "duration_seconds": 15,
+      "output_frames": 362,
+      "sampler_seconds": 328.725,
+      "decoder_tail_seconds": 50.405,
+      "sampler_state": "warm",
+      "status": "success",
+      "evidence": ["E1"]
+    },
+    {
+      "id": "fatal_oom_8t10_640x1152_15s",
+      "sampler_route": "8x Tesla T10",
+      "resolution": "640x1152",
+      "duration_seconds": 15,
+      "elapsed_before_failure_seconds": 204.389,
+      "status": "fatal_task_oom",
+      "reported_rank_additional_memory_required_gib": 1.06,
+      "reported_free_memory_mib": 558.62,
+      "retried": false,
+      "larger_15s_profile_attempted": false,
+      "evidence": ["E1"]
+    },
+    {
+      "id": "same_host_t10_decode_736x1280_5s",
+      "sampler_route": "existing latent; not measured",
+      "decoder_route": "single Tesla T10",
+      "resolution": "736x1280",
+      "duration_seconds": 5,
+      "output_frames": 124,
+      "sampler_seconds": null,
+      "decoder_tail_seconds": 72.588,
+      "decoder_state": "cold model, no transfer",
+      "video_vae": "FP16",
+      "comparison_limit": "Not a matched hardware comparison to the RTX 3080 Ti INT8 ConvRot warm decode path.",
+      "status": "success",
+      "evidence": ["E1"]
+    }
+  ],
+  "six_job_batches": [
+    {
+      "id": "low_8t10_plus_decoder",
+      "resolution": "416x736",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "8x Tesla T10 + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_seconds": 133.314,
+      "makespan_seconds": 440.791,
+      "throughput_per_hour": 49.0,
+      "completion_intervals_seconds": [49.114, 64.525, 64.643, 64.708, 63.593],
+      "service_startup_included": false,
+      "evidence": ["E1"]
+    },
+    {
+      "id": "low_4plus4_t10_plus_decoder",
+      "resolution": "416x736",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "two independent 4x Tesla T10 pools + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_seconds": 146.396,
+      "makespan_seconds": 296.917,
+      "throughput_per_hour": 72.75,
+      "completion_intervals_seconds": [11.557, 52.184, 10.243, 64.888, 11.441],
+      "service_startup_included": false,
+      "default_complexity_gate": "passed versus 8-card single pool",
+      "evidence": ["E1"]
+    },
+    {
+      "id": "low_4plus4_xtx_plus_decoder",
+      "resolution": "416x736",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "two independent 4x Tesla T10 pools + 1x RX 7900 XTX sampler + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_marker_seconds": 147.707,
+      "last_output_marker_seconds": 266.094,
+      "makespan_seconds": 266.324,
+      "makespan_clock": "coordinator monotonic",
+      "throughput_per_hour": 81.1,
+      "completion_timing_note": "Use remote marker mtimes for per-job completion. Do not use the coordinator observed_seconds field as marker time; it was delayed by child-process waiting.",
+      "throughput_gain_vs_4plus4_t10_percent": 11.5,
+      "default_complexity_gate_percent": 15.0,
+      "default_complexity_gate": "not met; candidate only",
+      "watcher_restart_with_existing_latent": "verified",
+      "evidence": ["E2"]
+    },
+    {
+      "id": "low_8t10_xtx_plus_decoder",
+      "resolution": "416x736",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "8x Tesla T10 single pool + 1x RX 7900 XTX sampler + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_seconds": 136.91,
+      "last_output_seconds": 332.705,
+      "makespan_seconds": 332.706,
+      "throughput_per_hour": 64.92,
+      "max_decoder_pending": 0,
+      "throughput_gain_vs_8t10_percent": 32.5,
+      "throughput_change_vs_4plus4_t10_percent": -10.8,
+      "throughput_change_vs_low_4plus4_xtx_percent": -20.0,
+      "default_route": false,
+      "evidence": ["E3"]
+    },
+    {
+      "id": "high_8t10_plus_decoder",
+      "resolution": "736x1280",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "8x Tesla T10 + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_seconds": 238.642,
+      "makespan_seconds": 1024.217,
+      "throughput_per_hour": 21.09,
+      "service_startup_included": false,
+      "evidence": ["E4"]
+    },
+    {
+      "id": "high_8t10_xtx_plus_decoder",
+      "resolution": "736x1280",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "8x Tesla T10 single pool + 1x RX 7900 XTX sampler + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_seconds": 241.279,
+      "makespan_seconds": 945.328,
+      "throughput_per_hour": 22.85,
+      "throughput_gain_vs_high_8t10_percent": 8.3,
+      "default_route": false,
+      "evidence": ["E4"]
+    },
+    {
+      "id": "high_4plus4_t10_plus_decoder",
+      "resolution": "736x1280",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "two independent 4x Tesla T10 pools + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_seconds": 346.771,
+      "makespan_seconds": 902.538,
+      "throughput_per_hour": 23.93,
+      "throughput_gain_vs_high_8t10_percent": 13.5,
+      "evidence": ["E4"]
+    },
+    {
+      "id": "high_4plus4_xtx_plus_decoder",
+      "resolution": "736x1280",
+      "duration_seconds": 5,
+      "output_frames_per_job": 124,
+      "topology": "two independent 4x Tesla T10 pools + 1x RX 7900 XTX sampler + 1x RTX 3080 Ti decoder",
+      "success_jobs": 6,
+      "first_output_seconds": 352.477,
+      "makespan_seconds": 677.538,
+      "throughput_per_hour": 31.88,
+      "throughput_gain_vs_high_4plus4_t10_percent": 33.2,
+      "human_visual_audio_review": "pending",
+      "four_card_allocator_oom_warning": {
+        "requested_allocation_gib": 0.94,
+        "recovered": true,
+        "all_jobs_succeeded": true,
+        "distinction": "Recoverable allocator warning; not the fatal 8-card 15-second task OOM."
+      },
+      "evidence": ["E4"]
+    }
+  ],
+  "network": {
+    "link_rate_gbps": 10,
+    "duplex": "full",
+    "ping_average_ms_observed": [0.174, 0.263],
+    "latent_bytes": 13129844,
+    "same_file_transfer_seconds": [0.981, 0.585, 0.567],
+    "sha256_matches": 3,
+    "iperf3_test": "not run; one endpoint lacked the client and no package was installed",
+    "claim_limit": "Small-file transfer includes SSH setup overhead and is not a link-capacity benchmark.",
+    "evidence": ["E1"]
+  },
+  "configuration": {
+    "steps": 6,
+    "sampler": "Euler/simple",
+    "fsdp": true,
+    "cpu_offload": false,
+    "t10_attention": "TORCH_EFFICIENT",
+    "xtx_attention": "CK",
+    "t10_ulysses_ring": {
+      "4_card": "Ulysses=4, Ring=1",
+      "8_card": "Ulysses=8, Ring=1"
+    },
+    "main_model": {
+      "precision": "INT8 ConvRot hybrid",
+      "filename": "10Eros_Max_h3_TURBO-hybrid_beta4_int8_convrot.safetensors"
+    },
+    "text_encoder": {
+      "precision": "Qwen3-VL 32B INT8 ConvRot",
+      "filename": "qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
+    },
+    "lora": {
+      "precision": "BF16",
+      "filename": "minimax_h3_fl2v_turbo_4step_v0.1_768p_sla_comfyui_bf16.safetensors",
+      "inference_steps": 6,
+      "note": "Filename includes 4step; these measurements used six-step Euler/simple."
+    },
+    "sampling_vaes": {
+      "video": "minimax_h3_video_vae_fp16.safetensors (FP16)",
+      "audio": "minimax_h3_audio_vae_fp32.safetensors (FP32)"
+    },
+    "decoder_vaes": {
+      "video": "minimax_h3_video_vae_int8_convrot.safetensors (INT8 ConvRot)",
+      "audio": "minimax_h3_audio_vae_fp32.safetensors (FP32)"
+    },
+    "torch_builds": {
+      "T10_and_RTX_3080_Ti": "2.13.0+cu130",
+      "RX_7900_XTX": "2.12.0+rocm7.14.0"
+    },
+    "comfyui_decoder_log": {
+      "version": "0.34.0",
+      "python": "3.12.3",
+      "scope_limit": "Observed on decoder endpoint only; not a complete version matrix for all samplers."
+    },
+    "read_only_source_snapshots": {
+      "snapshot_kind": "read-only end-of-run closeout snapshot",
+      "t10_comfyui_head": "5fa5e05d9ecc54f0f412c28242b38506cf9a8ea4",
+      "t10_raylight_head": "1a4ee4a608e67d3570ad75d1318a210466f1a76b",
+      "t10_raylight_worktree_clean": true,
+      "rtx_3080_ti_comfyui_head": "e80c1570b6b44a2557d5d8e341e05782d18c9bbb",
+      "xtx_git_snapshot": "unavailable; isolated app has no .git directory",
+      "scope_limit": "Read-only source HEAD snapshot; does not independently bind every running process to loaded module bytes."
+    },
+    "additional_observed_versions": {
+      "t10_pip_torch": "2.13.0",
+      "t10_ray": "2.58.0",
+      "t10_xfuser": "0.4.4",
+      "t10_safetensors": "0.8.0",
+      "xtx_comfy_kitchen": "0.2.32",
+      "xtx_safetensors": "0.8.0"
+    },
+    "audio_fix_patch_provenance": {
+      "comfyui_patch_base_to_tested_snapshot": ["bdcb886", "5fa5e05d9ecc54f0f412c28242b38506cf9a8ea4"],
+      "comfyui_patch_scope": "torch.lerp dtype compatibility; base contains the AV sampling fix.",
+      "raylight_patch_base_to_tested_snapshot": ["63ae5b8", "1a4ee4a608e67d3570ad75d1318a210466f1a76b"],
+      "raylight_patch_scope": "SM75 FP16 Ulysses and lerp compatibility; base contains the AV sampling fix.",
+      "source_document": "h3_handoff/sm75_ab/RESULTS_2026-09-22.md",
+      "patch_files_in_public_package": true,
+      "package_patch_directory": "assets/patches/",
+      "note": "Historical patch provenance plus read-only source HEAD snapshots; patch files were present in the inspected package tree."
+    },
+    "a6_multigpu_clip_loader": {
+      "package_asset_path": "assets/comfyui_h3_multigpu_clip/__init__.py",
+      "install_path": "custom_nodes/comfyui_h3_multigpu_clip/__init__.py",
+      "license": "Apache-2.0",
+      "historical_upstream_source": "Eanya-Tonic",
+      "sha256": "b899f87628c562425f026be339461bee2859620e98add1d2efe43b9fcaec613c",
+      "included_in_package": true
+    },
+    "reproduction_patches": [
+      {
+        "package_path": "assets/patches/comfy-turing-lerp.patch",
+        "source_to_snapshot": ["bdcb886", "5fa5e05d9ecc54f0f412c28242b38506cf9a8ea4"],
+        "scope": "torch.lerp dtype compatibility; source base includes AV sampling fix",
+        "sha256": "72736bfc1eec4eb6b3c3e0fff8e504aa5bad2ecc055f6d0fd8a2eba19d457d48"
+      },
+      {
+        "package_path": "assets/patches/raylight-sm75-ulysses.patch",
+        "source_to_snapshot": ["63ae5b8", "1a4ee4a608e67d3570ad75d1318a210466f1a76b"],
+        "scope": "SM75 FP16 Ulysses and lerp compatibility; source base includes AV sampling fix",
+        "sha256": "affde1c6f03df0d7946aac92c706c777bb1c4371ae3f0c4cad3cecec4cd5aeee"
+      }
+    ],
+    "patch_review_location": "assets/patches/",
+    "public_package_cli": {
+      "distribution_name": "h3-multigpu-pipeline",
+      "entrypoint": "scripts/pipeline.py",
+      "public_defaults": "config/public-defaults.json",
+      "host_adapter_example": "config/host-adapter.example.json",
+      "modes": ["eight_plus_one", "eight_xtx_plus_one", "four_four_plus_one", "four_four_xtx_plus_one"],
+      "commands": {
+        "plan": "--mode --width --height --seconds --count --seed",
+        "config-adapt": "--host-map --out; base is config/public-defaults.json",
+        "preflight": "--config",
+        "start_status_stop": "--config --mode",
+        "run_submit": "--config --mode --prompt-file --reference-file --width --height --seconds --count --seed",
+        "wait": "RUN_ID --timeout"
+      },
+      "cli_source_reviewed": true,
+      "remote_or_e2e_execution_by_this_worker": false,
+      "implementation_acceptance": "not asserted; implementation remains under review"
+    }
+  },
+  "output_and_quality_gates": {
+    "latent": "Video and audio tensors finite FP32; checksum sidecar checked.",
+    "low_batch_mp4": "H.264, 416x736, 124 frames, 24 fps, AAC 32 kHz stereo, 5.167 seconds; full FFmpeg decode passed.",
+    "high_batch_mp4": "H.264, 736x1280, 124 frames, AAC 32 kHz stereo; all 24 full FFmpeg decodes passed and each decoded frame had a distinct frame MD5.",
+    "four_vs_eight_pixel_identity": false,
+    "four_vs_eight_video_ssim_all": 0.827008,
+    "early_audio_distortion_fix": "ModelSamplingAV crackle fix passed historical acceptance; raw FLAC Abs peak count reduced from about 208 to 1 and full listening confirmed the crackle was fixed.",
+    "current_subjective_audio_quality": "Initial-round audio was usable but remained mediocre by subjective review.",
+    "initial_round_human_review": "Overall picture acceptable; occasional clothing hallucination attributed to prompt adherence.",
+    "later_three_source_and_highres_human_review": "Not established by the initial review; high-resolution 24-item review pending."
+  },
+  "evidence_map": [
+    {
+      "id": "E1",
+      "document_title": "MiniMax H3：8×Tesla T10、RX 7900 XTX 与 RTX 3080 Ti 多轮实测",
+      "covers": ["single-job timings", "capacity OOM", "10GbE", "low-resolution six-job 8+1 versus 4+4+1", "initial human gate"]
+    },
+    {
+      "id": "E2",
+      "document_title": "H3 三采样源 + 单 3080 Ti 解码实测",
+      "covers": ["low-resolution 4+4+XTX six-job markers and monotonic makespan", "queue", "watcher restart"]
+    },
+    {
+      "id": "E3",
+      "document_title": "H3：8×T10 + RX 7900 XTX 双采样源、单 3080 Ti 解码实测",
+      "covers": ["low-resolution 8+XTX six-job batch", "job assignment", "queue and media gate"]
+    },
+    {
+      "id": "E4",
+      "document_title": "MiniMax H3 736×1280 / 5 秒四拓扑吞吐实测",
+      "covers": ["high-resolution four-topology matrix", "allocator warning", "media gates and pending human review"]
+    },
+    {
+      "id": "E5",
+      "document_title": "Frozen workflow and runner source set",
+      "covers": ["seed/profile assignments", "timing boundaries", "batch coordinator behavior"]
+    },
+    {
+      "id": "E6",
+      "document_title": "h3_handoff/sm75_ab/RESULTS_2026-09-22.md",
+      "covers": ["historical ModelSamplingAV patch provenance only"]
+    }
+  ],
+  "not_verified": [
+    "XTX isolated app source commit; no .git directory was available.",
+    "Byte-level proof that each running process loaded the source tree at the recorded HEAD.",
+    "A complete all-endpoint lockfile and dependency version matrix; none is assumed to be delivered.",
+    "E2E behavior of the reviewed CLI, including service lifecycle and parity with old watcher resume semantics.",
+    "10GbE line-rate throughput.",
+    "A 10-second dual-four-card batch.",
+    "Human review of the 24 high-resolution outputs and later topology-specific outputs.",
+    "Performance or capacity for unlisted resolutions, durations, topologies, or runtimes.",
+    "Whether the package CLI reproduces measured timings and failure recovery on the target hardware."
+  ],
+  "privacy": {
+    "original_prompts_included": false,
+    "reference_images_included": false,
+    "private_reference_hash_included": false,
+    "raw_logs_or_private_media_included": false,
+    "local_private_identifiers_included": false,
+    "reproduction_limit": "Use authorized public inputs. Replacing withheld prompt/reference preserves the procedure but cannot reproduce identical content or pixel-level comparisons."
+  }
+}

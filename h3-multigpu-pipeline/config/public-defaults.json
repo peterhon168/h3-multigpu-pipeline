@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "hosts": {
+    "t10": {
+      "ssh_alias": "SET_LOCAL_SSH_ALIAS_FOR_T10_HOST",
+      "ssh_options": [],
+      "comfy_root": "/srv/comfyui-t10",
+      "python": "venv/bin/python",
+      "input_dir": "/srv/comfyui-t10/input",
+      "run_root": "/srv/h3-pipeline",
+      "api_host": "127.0.0.1",
+      "env": {},
+      "unset_env": [],
+      "launch_prefix": [],
+      "extra_args": [],
+      "handoff_ssh_options": []
+    },
+    "xtx": {
+      "ssh_alias": "SET_LOCAL_SSH_ALIAS_FOR_XTX_HOST",
+      "ssh_options": [],
+      "comfy_root": "/srv/comfyui-xtx",
+      "python": "venv/bin/python",
+      "input_dir": "/srv/comfyui-xtx/input",
+      "run_root": "/srv/h3-pipeline-xtx",
+      "api_host": "127.0.0.1",
+      "env": {},
+      "unset_env": [],
+      "launch_prefix": [],
+      "extra_args": [],
+      "same_host_as_decoder": false
+    },
+    "decoder": {
+      "ssh_alias": "SET_LOCAL_SSH_ALIAS_FOR_DECODER_HOST",
+      "ssh_options": [],
+      "comfy_root": "/srv/comfyui-decoder",
+      "python": "venv/bin/python",
+      "input_dir": "/srv/comfyui-decoder/input",
+      "run_root": "/srv/h3-pipeline-decoder",
+      "api_host": "127.0.0.1",
+      "env": {},
+      "unset_env": [],
+      "launch_prefix": [],
+      "extra_args": []
+    }
+  },
+  "pools": {
+    "t10_8": {
+      "host": "t10",
+      "kind": "t10",
+      "port": 8188,
+      "master_port": 29680,
+      "gpu_ids": "0,1,2,3,4,5,6,7",
+      "gpu_count": 8,
+      "ulysses_degree": 8,
+      "ring_degree": 1,
+      "workflow": "workflows/t10_sampler.template.json"
+    },
+    "t10_4a": {
+      "host": "t10",
+      "kind": "t10",
+      "port": 8188,
+      "master_port": 29681,
+      "gpu_ids": "0,1,2,3",
+      "gpu_count": 4,
+      "ulysses_degree": 4,
+      "ring_degree": 1,
+      "workflow": "workflows/t10_sampler.template.json"
+    },
+    "t10_4b": {
+      "host": "t10",
+      "kind": "t10",
+      "port": 8189,
+      "master_port": 29682,
+      "gpu_ids": "4,5,6,7",
+      "gpu_count": 4,
+      "ulysses_degree": 4,
+      "ring_degree": 1,
+      "workflow": "workflows/t10_sampler.template.json"
+    },
+    "xtx": {
+      "host": "xtx",
+      "kind": "xtx",
+      "port": 8299,
+      "master_port": null,
+      "gpu_ids": "0",
+      "gpu_count": 1,
+      "ulysses_degree": 1,
+      "ring_degree": 1,
+      "workflow": "workflows/xtx_sampler.template.json"
+    }
+  },
+  "decoder": {
+    "host": "decoder",
+    "kind": "decoder",
+    "port": 8192,
+    "master_port": 29692,
+    "gpu_ids": "0",
+    "workflow": "workflows/decoder.template.json",
+    "transfer": {
+      "preferred": "10gbe",
+      "fallback": "lan",
+      "targets": {
+        "10gbe": "SET_LOCAL_T10_TO_DECODER_10GB_TARGET",
+        "lan": "SET_LOCAL_T10_TO_DECODER_LAN_TARGET"
+      }
+    },
+    "video_vae": "H3/minimax_h3_video_vae_int8_convrot.safetensors",
+    "audio_vae": "H3/minimax_h3_audio_vae_fp32.safetensors",
+    "fps": 24,
+    "max_pending": 2,
+    "enqueue_timeout_seconds": 900,
+    "decode_timeout_seconds": 1800
+  },
+  "routes": {
+    "eight_plus_one": ["t10_8"],
+    "eight_xtx_plus_one": ["t10_8", "xtx"],
+    "four_four_plus_one": ["t10_4a", "t10_4b"],
+    "four_four_xtx_plus_one": ["t10_4a", "t10_4b", "xtx"]
+  },
+  "timeouts": {
+    "ssh_seconds": 20,
+    "service_start_seconds": 120,
+    "service_stop_seconds": 45,
+    "sampler_seconds": 5400,
+    "http_seconds": 15,
+    "poll_seconds": 1,
+    "transfer_seconds": 900,
+    "decode_seconds": 1800
+  },
+  "required_nodes": {
+    "sampler": [
+      "H3MultiGPUCLIPLoader",
+      "MiniMaxH3ReferenceToVideo",
+      "XFuserSamplerCustomAdvanced",
+      "SaveH3Latent"
+    ],
+    "decoder": [
+      "LoadH3Latent",
+      "VAEDecode",
+      "VAEDecodeAudio",
+      "CreateVideo",
+      "SaveVideo"
+    ]
+  },
+  "dependency_snapshot": {
+    "t10_comfyui_head": "5fa5e05d9ecc54f0f412c28242b38506cf9a8ea4",
+    "t10_raylight_head": "1a4ee4a608e67d3570ad75d1318a210466f1a76b",
+    "decoder_comfyui_head": "e80c1570b6b44a2557d5d8e341e05782d18c9bbb",
+    "xtx_comfyui_commit": null,
+    "t10_torch": "2.13.0+cu130",
+    "t10_ray": "2.58.0",
+    "t10_xfuser": "0.4.4",
+    "safetensors": "0.8.0",
+    "xtx_torch": "2.12.0+rocm7.14.0",
+    "xtx_comfy_kitchen": "0.2.32"
+  },
+  "workflow_nodes": {
+    "sampler": {
+      "seed_class": "XFuserSamplerCustomAdvanced",
+      "prompt_class": "PrimitiveStringMultiline",
+      "reference_class": "LoadImage",
+      "reference_video_class": "MiniMaxH3ReferenceToVideo",
+      "duration_class": "PrimitiveFloat",
+      "resolution_class": "ResolutionSelector",
+      "clip_loader_class": "H3MultiGPUCLIPLoader",
+      "ray_initializer_class": "RayInitializer",
+      "save_class": "SaveH3Latent"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+diff --git a/comfy/ldm/minimax/model.py b/comfy/ldm/minimax/model.py
+index 98bd841..fd10404 100644
+--- a/comfy/ldm/minimax/model.py
++++ b/comfy/ldm/minimax/model.py
+@@ -612,7 +612,7 @@ class MiniMaxH3Model(nn.Module):
+             table = comfy.model_management.cast_to(self.adaln_t_table, device=device)
+             pos = t_vals.clamp(0.0, 1.0) * (table.shape[0] - 1)     # t in [0,1] -> fractional grid index, out-of-range t clamps to the curve ends
+             i0 = pos.floor().long().clamp(max=table.shape[0] - 2)   # lower grid row, max-clamp keeps t=1.0 on the last interval instead of reading past the table
+-            t_emb = torch.lerp(table[i0], table[i0 + 1], (pos - i0).unsqueeze(1))  # blend the two rows by the fractional part
++            t_emb = torch.lerp(table[i0].to(torch.float32), table[i0 + 1].to(torch.float32), (pos - i0).unsqueeze(1)).to(table.dtype)  # [fix] bf16 table vs fp32 weight dtype mismatch  # blend the two rows by the fractional part
+         else:
+             t_emb = self.time_embedder(t_vals).to(dtype)

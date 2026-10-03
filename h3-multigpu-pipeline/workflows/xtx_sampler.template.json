@@ -1,0 +1,164 @@
+{
+  "119": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "MiniMax-H3/minimax_h3_video_vae_fp16.safetensors"
+    }
+  },
+  "120": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "MiniMax-H3/minimax_h3_audio_vae_fp32.safetensors"
+    }
+  },
+  "128": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "MiniMax-H3/qwen3vl_32b_minimax_h3_int8_convrot.safetensors",
+      "device": "default",
+      "type": "minimax"
+    }
+  },
+  "136": {
+    "class_type": "MiniMaxH3ReferenceToVideo",
+    "inputs": {
+      "audio_vae": [
+        "120",
+        0
+      ],
+      "clip": [
+        "128",
+        0
+      ],
+      "height": 736,
+      "length": 124,
+      "prompt": [
+        "138",
+        0
+      ],
+      "ref_image_size": "match",
+      "ref_images.ref_image_0": [
+        "139",
+        0
+      ],
+      "vae": [
+        "119",
+        0
+      ],
+      "width": 416
+    }
+  },
+  "138": {
+    "class_type": "PrimitiveStringMultiline",
+    "inputs": {
+      "value": "Generic portrait video prompt. Replace this text by explicitly supplying --prompt-file to pipeline.py run."
+    }
+  },
+  "139": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "REFERENCE_IMAGE_REQUIRED"
+    }
+  },
+  "147": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "H3-AB/10Eros_Max_h3_TURBO-hybrid_beta4_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "148": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "conditioning": [
+        "136",
+        0
+      ],
+      "model": [
+        "159",
+        0
+      ]
+    }
+  },
+  "149": {
+    "class_type": "BasicScheduler",
+    "inputs": {
+      "denoise": 1,
+      "model": [
+        "159",
+        0
+      ],
+      "scheduler": "simple",
+      "steps": 6
+    }
+  },
+  "150": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "euler"
+    }
+  },
+  "151": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "guider": [
+        "148",
+        0
+      ],
+      "latent_image": [
+        "136",
+        1
+      ],
+      "noise": [
+        "160",
+        0
+      ],
+      "sampler": [
+        "150",
+        0
+      ],
+      "sigmas": [
+        "149",
+        0
+      ]
+    }
+  },
+  "158": {
+    "class_type": "LoraLoaderBypassModelOnly",
+    "inputs": {
+      "lora_name": "H3-AB/minimax_h3_fl2v_turbo_4step_v0.1_768p_sla_comfyui_bf16.safetensors",
+      "model": [
+        "147",
+        0
+      ],
+      "strength_model": 1
+    }
+  },
+  "159": {
+    "class_type": "MiniMaxH3SigmaShift",
+    "inputs": {
+      "model": [
+        "158",
+        0
+      ],
+      "shift_audio": 3,
+      "shift_video": 12
+    }
+  },
+  "160": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 0
+    }
+  },
+  "172": {
+    "class_type": "SaveH3Latent",
+    "inputs": {
+      "filename_prefix": "h3_handoff/RUN_ID/seed_SEED",
+      "samples": [
+        "151",
+        0
+      ]
+    }
+  }
+}

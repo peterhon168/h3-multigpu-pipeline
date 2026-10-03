@@ -1,0 +1,33 @@
+{
+  "release": "v2026.10.03",
+  "privacy_scan": "passed",
+  "gpu_e2e_rerun": false,
+  "files": {
+    ".gitignore": "c230dec243451a74ef8b291fa5616e955e6331b64428e3f473f4bef9178a5aa8",
+    "FORUM_REPRODUCTION.md": "16d1c3e5da827daf15ad809074b65b005415d908220d05a569c98c17a63d1ff2",
+    "README.md": "098d73076bae4bbf123f14cbdeaa498cc0f7e09f7c2caf4c405da17337e71b9d",
+    "THIRD_PARTY_NOTICES.md": "0645ca345f07d2b0448adf476c7d80f7131007b666a96a94be34771651d10757",
+    "h3-multigpu-pipeline/README.md": "bce1b2e480cd3dda5880d1519c73c799314ca0bf72ee739a8cbe91c1884309a5",
+    "h3-multigpu-pipeline/SKILL.md": "9e281cb24643ad0ef0c69fc1eb51e95a807b5e75dd33faff2f365976f165e0de",
+    "h3-multigpu-pipeline/agents/openai.yaml": "4856d31714045d64d78e16f842ce3c3afcf5527b3b186c74c18db2eb0e6499cb",
+    "h3-multigpu-pipeline/assets/comfyui_h3_multigpu_clip/__init__.py": "b899f87628c562425f026be339461bee2859620e98add1d2efe43b9fcaec613c",
+    "h3-multigpu-pipeline/assets/h3_latent_handoff/__init__.py": "9e4c034ebc50dc63e823d702ccc91abacf0e88a2e70312b4aa58976137b7452b",
+    "h3-multigpu-pipeline/assets/patches/comfy-turing-lerp.patch": "72736bfc1eec4eb6b3c3e0fff8e504aa5bad2ecc055f6d0fd8a2eba19d457d48",
+    "h3-multigpu-pipeline/assets/patches/raylight-sm75-ulysses.patch": "affde1c6f03df0d7946aac92c706c777bb1c4371ae3f0c4cad3cecec4cd5aeee",
+    "h3-multigpu-pipeline/config/host-adapter.example.json": "180ccb3ed3f67e8d3f6d341e1257e93dae8501e6efb0d6f06afefdf31b3718ce",
+    "h3-multigpu-pipeline/config/public-defaults.json": "78aea0703f660908e7aaaa7e442f15218274d51af7805e262e30ad88fb7938fc",
+    "h3-multigpu-pipeline/config/schema.json": "651edf7d03891fa3314dccf58d88c926d86c8177416333fcef3250a4db15a066",
+    "h3-multigpu-pipeline/references/operations-and-recovery.md": "542e543f800907648c59f02c47d49fdbb2c31ca1f10404db0d7dd053ce128ff5",
+    "h3-multigpu-pipeline/references/run-modes-and-admission.md": "92c2e89f1bc360c85e924f628436fbb288a76cedd3dd3a48ce2705082e3e9de6",
+    "h3-multigpu-pipeline/references/runtime-and-assets.md": "3008ca574c9e606a8f61f2665ee8d306ffd7330fce6b30563c39cd8b31c4dd50",
+    "h3-multigpu-pipeline/scripts/h3_pipeline.py": "00ebced57ed1a0dc8f7837ca5837f6f4603aaf17a28311f58dacf93a96958bd0",
+    "h3-multigpu-pipeline/scripts/pipeline.py": "3b075e15e7f88e8971aa7242645982a5c1d5510b535e2ec6a02705cb812f52b6",
+    "h3-multigpu-pipeline/scripts/remote_worker.py": "6f3141332ffb8083397429b9c7cc4bc4e6d2bea172ea1fd468ce388c741f7155",
+    "h3-multigpu-pipeline/workflows/decoder.template.json": "255cdeb683326ad59eb994af0edb886ec0ae9d03ec2dfd394c0c7ff8a1b06c38",
+    "h3-multigpu-pipeline/workflows/t10_sampler.template.json": "3addec6d56a2a0cdb4d9c84ea802577de547ae1c686027d3041e1cbf4af47ff1",
+    "h3-multigpu-pipeline/workflows/xtx_sampler.template.json": "6fc1a3fbb6d7c73c960fe817320221a5d9986a4cab99b19e7e1d1381d133e845",
+    "licenses/Apache-2.0.txt": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+    "licenses/GPL-3.0.txt": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "results.json": "8794a1f6913dc4f9e3f39209431fec9ab4832b1d367fd5d15d33c11416382082"
+  }
+}

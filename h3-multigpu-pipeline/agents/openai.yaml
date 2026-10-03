@@ -1,0 +1,4 @@
+interface:
+  display_name: "H3 多 GPU 生产流水线"
+  short_description: "按验收规格运行 H3 多 GPU 采样、解码与任务恢复"
+  default_prompt: "Use $h3-multigpu-pipeline to plan or recover an H3 production run on a validated topology."

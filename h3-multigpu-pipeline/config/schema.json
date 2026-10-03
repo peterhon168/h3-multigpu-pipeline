@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/h3-multigpu-pipeline-config.schema.json",
+  "title": "H3 multi-GPU pipeline local config",
+  "type": "object",
+  "required": ["schema_version", "hosts", "pools", "decoder", "routes", "timeouts"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "hosts": {
+      "type": "object",
+      "required": ["t10", "xtx", "decoder"],
+      "additionalProperties": false,
+      "patternProperties": {
+        "^(t10|xtx|decoder)$": {
+          "type": "object",
+          "required": ["comfy_root", "python", "input_dir", "run_root", "api_host"],
+          "anyOf": [{"required": ["ssh_alias"]}, {"required": ["ssh_target"]}],
+          "properties": {
+            "ssh_alias": {"type": "string", "minLength": 1},
+            "ssh_target": {"type": "string", "minLength": 1},
+            "ssh_options": {"type": "array", "items": {"type": "string"}},
+            "handoff_ssh_options": {"type": "array", "items": {"type": "string"}},
+            "comfy_root": {"type": "string", "minLength": 1},
+            "python": {"type": "string", "minLength": 1},
+            "input_dir": {"type": "string", "minLength": 1},
+            "run_root": {"type": "string", "minLength": 1},
+            "api_host": {"type": "string", "minLength": 1},
+            "env": {"type": "object", "additionalProperties": {"type": "string"}},
+            "unset_env": {"type": "array", "items": {"type": "string"}},
+            "launch_prefix": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]},
+            "extra_args": {"oneOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}]}
+          },
+          "additionalProperties": true
+        }
+      }
+    },
+    "pools": {"type": "object", "required": ["t10_8", "t10_4a", "t10_4b", "xtx"]},
+    "decoder": {
+      "type": "object",
+      "required": ["host", "kind", "port", "workflow", "video_vae", "audio_vae", "fps", "max_pending", "enqueue_timeout_seconds", "decode_timeout_seconds"],
+      "properties": {
+        "transfer": {
+          "type": "object",
+          "properties": {
+            "preferred": {"type": "string"},
+            "fallback": {"type": ["string", "null"]},
+            "targets": {"type": "object", "additionalProperties": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "routes": {
+      "type": "object",
+      "required": ["eight_plus_one", "eight_xtx_plus_one", "four_four_plus_one", "four_four_xtx_plus_one"]
+    },
+    "timeouts": {"type": "object"},
+    "required_nodes": {"type": "object"},
+    "dependency_snapshot": {"type": "object"},
+    "workflow_nodes": {"type": "object"}
+  },
+  "additionalProperties": true
+}
